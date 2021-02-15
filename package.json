@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@wry/equality": "^0.3.1",
-    "native-x-theme": "^1.0.5",
+    "native-x-theme": "^1.0.6",
     "react-native-fast-image": "^8.3.4"
   },
   "devDependencies": {
