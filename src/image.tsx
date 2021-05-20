@@ -53,7 +53,7 @@ export const Image = React.memo((props: ImageProps) => {
       setSource(fallbackSource)
       setKey(Math.random())
     }
-  }, [fallbackSource])
+  }, [fallback, fallbackSource])
 
   return (
     <ImageComponent
