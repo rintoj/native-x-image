@@ -1,43 +1,24 @@
-import { equal as isEqual } from '@wry/equality'
-import {
-  BackgroundColorStyleProps,
-  BorderRadiusStyleProps,
-  useContainerStyle,
-} from 'native-x-theme'
+import { useContainerStyle } from 'native-x-theme'
 import * as React from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import FastImage, { FastImageProps, Source } from 'react-native-fast-image'
+import {
+  ImageProps,
+  ImagePropsWithFill,
+  ImagePropsWithWidthAndHeight,
+  useDeepMemo,
+} from './image-props'
 
-function useDeepMemo<TKey, TValue>(memoFn: () => TValue, key: TKey): TValue {
-  const ref = useRef<{ key: TKey; value: TValue }>()
-  if (!ref.current || !isEqual(key, ref.current.key)) {
-    ref.current = { key, value: memoFn() }
-  }
-  return ref.current.value
-}
+import { Platform } from 'react-native'
 
-interface BasicImageProps
-  extends FastImageProps,
-    BorderRadiusStyleProps,
-    BackgroundColorStyleProps {
-  fallbackSource?: Source
-}
-
-interface ImagePropsWithWidthAndHeight extends BasicImageProps {
-  width: number
-  height: number
-}
-
-interface ImagePropsWithFill extends BasicImageProps {
-  fill: boolean
-}
-
-type ImageProps = ImagePropsWithWidthAndHeight | ImagePropsWithFill
+export const ImageComponent =
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  Platform.OS === 'web' ? require('react-native').Image : require('react-native-fast-image')
 
 export const Image = React.memo((props: ImageProps) => {
   const initialized = useRef(false)
   const {
     source: originalSource,
+    fallback = true,
     fallbackSource,
     resizeMode = 'cover',
     width,
@@ -46,7 +27,7 @@ export const Image = React.memo((props: ImageProps) => {
     ...imageProps
   } = props as ImagePropsWithWidthAndHeight & ImagePropsWithFill
   const [key, setKey] = useState(Math.random())
-  const [source, setSource] = useState<any>(originalSource || fallbackSource)
+  const [source, setSource] = useState<any>(originalSource ?? fallbackSource)
   const containerStyle = useContainerStyle(props)
   const style = useMemo(
     () => [
@@ -68,15 +49,18 @@ export const Image = React.memo((props: ImageProps) => {
   }, [uri])
 
   const onError = useCallback(() => {
-    setSource(fallbackSource)
+    if (fallback) {
+      setSource(fallbackSource)
+      setKey(Math.random())
+    }
   }, [fallbackSource])
 
   return (
-    <FastImage
+    <ImageComponent
       key={key}
       {...imageProps}
       style={style as any}
-      fallback={fallbackSource != null}
+      fallback={false}
       resizeMode={resizeMode}
       source={source}
       onError={onError}
