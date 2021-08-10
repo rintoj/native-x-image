@@ -17,9 +17,6 @@
     "@wry/equality": "^0.3.1",
     "react-native-fast-image": "^8.3.4"
   },
-  "peerDependencies": {
-    "native-x-theme": "*"
-  },
   "devDependencies": {
     "@types/lodash": "^4.14.168",
     "@types/react-native": "^0.63.46",
